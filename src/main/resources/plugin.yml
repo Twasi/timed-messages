@@ -1,0 +1,15 @@
+name: "Timed Messages"
+main: at.saith.twasi.TimedMessagesPlugin
+version: 1.0
+description:  "Adds timers to your stream."
+author: Saith
+
+commands:
+  - timer
+
+permissions:
+  - twasi.timer.add
+  - twasi.timer.delete
+  - twasi.timer.list
+  - twasi.timer.enable
+  - twasi.timer.disable
