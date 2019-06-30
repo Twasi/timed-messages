@@ -10,31 +10,26 @@ public class TimerEntity extends BaseEntity {
     @Reference
     private User user;
 
-    private String name;
-    private String msg;
+    private String command;
     private int interval;//in Seconds
     private boolean enabled;
 
     public TimerEntity(){}
 
-    public TimerEntity(User user, String name,String msg, int interval, boolean enabled) {
+    public TimerEntity(User user,String command, int interval, boolean enabled) {
         this.user = user;
-        this.name = name;
-        this.msg = msg;
+        this.command = command;
         this.interval = interval;
         this.enabled = enabled;
     }
 
-    public String getName() {
-        return name;
-    }
 
     public User getUser() {
         return user;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getCommand() {
+        return command;
     }
 
     public int getInterval() {
