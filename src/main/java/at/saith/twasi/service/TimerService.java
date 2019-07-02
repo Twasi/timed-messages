@@ -32,23 +32,23 @@ public class TimerService implements IService {
         commandRepository = ServiceRegistry.get(DataService.class).get(CommandRepository.class);
     }
 
-    public void startTimers(TwasiUserPlugin userPlugin) {
-        deleteUnusedTimers(userPlugin);//Cleaning up the database
-        User user = userPlugin.getTwasiInterface().getStreamer().getUser();
+    public void startTimers(TwasiInterface twasiInterface) {
+        deleteUnusedTimers(twasiInterface);//Cleaning up the database
+        User user = twasiInterface.getStreamer().getUser();
         TwasiLogger.log.debug("Starting timers for user " + user.getTwitchAccount().getDisplayName());
 
-        stopTimers(userPlugin);
+        stopTimers(twasiInterface);
 
         List<TwasiTimer> timers = new ArrayList<>();
         registeredTimers.put(user.getId(), timers);
 
         for (TimerEntity timer : getTimersForUser(user)) {
-            timers.add(new TwasiTimer(userPlugin.getTwasiInterface(), timer.getCommand(), timer.getInterval(), timer.isEnabled()));
+            timers.add(new TwasiTimer(twasiInterface, timer.getCommand(), timer.getInterval(), timer.isEnabled()));
         }
     }
 
-    public void stopTimers(TwasiUserPlugin userPlugin) {
-        User user = userPlugin.getTwasiInterface().getStreamer().getUser();
+    public void stopTimers(TwasiInterface twasiInterface) {
+        User user = twasiInterface.getStreamer().getUser();
         TwasiLogger.log.debug("Starting timers for user " + user.getTwitchAccount().getDisplayName());
 
         List<TwasiTimer> runningTimers = getRunningTimersForUser(user);
@@ -58,11 +58,11 @@ public class TimerService implements IService {
     }
 
     //Deletes all Timers which commands have been deleted
-    private void deleteUnusedTimers(TwasiUserPlugin userPlugin) {
-        User user = userPlugin.getTwasiInterface().getStreamer().getUser();
+    private void deleteUnusedTimers(TwasiInterface twasiInterface) {
+        User user = twasiInterface.getStreamer().getUser();
         List<TimerEntity> timers = getTimersForUser(user);
         for (TimerEntity timer : timers) {
-            if (!commandExists(userPlugin.getTwasiInterface(), timer.getCommand())) {
+            if (!commandExists(twasiInterface, timer.getCommand())) {
                 repository.remove(timer);//remove timer from Database
                 timers.remove(timer);
             }
@@ -101,11 +101,10 @@ public class TimerService implements IService {
         return registeredTimers.get(user.getId()) != null;
     }
 
-    public TimerEntity registerTimer(TwasiUserPlugin userPlugin, String command, int interval) throws TimerException {
+    public TimerEntity registerTimer(TwasiInterface twasiInterface, String command, int interval) throws TimerException {
         if (command.startsWith(TimedMessagesPlugin.COMMAND_PREFIX)) {
             command = command.substring(TimedMessagesPlugin.COMMAND_PREFIX.length());
         }
-        TwasiInterface twasiInterface = userPlugin.getTwasiInterface();
         Streamer streamer = twasiInterface.getStreamer();
         User user = streamer.getUser();
 
@@ -140,8 +139,8 @@ public class TimerService implements IService {
         return timer;
     }
 
-    public TimerEntity removeTimer(TwasiUserPlugin userPlugin, String command) throws TimerException{
-        User user = userPlugin.getTwasiInterface().getStreamer().getUser();
+    public TimerEntity removeTimer(TwasiInterface twasiInterface, String command) throws TimerException{
+        User user = twasiInterface.getStreamer().getUser();
         TimerEntity entity = getTimerEntityForUserAndCommand(user,command);
 
         if(hasTimersEnabled(user)){
@@ -158,8 +157,8 @@ public class TimerService implements IService {
         return entity;
     }
 
-    public void enableTimer(TwasiUserPlugin userPlugin, String command, boolean enabled) throws TimerException {
-        User user = userPlugin.getTwasiInterface().getStreamer().getUser();
+    public void enableTimer(TwasiInterface twasiInterface, String command, boolean enabled) throws TimerException {
+        User user = twasiInterface.getStreamer().getUser();
         TimerEntity entity = getTimerEntityForUserAndCommand(user, command);
 
         entity.setEnabled(enabled);
