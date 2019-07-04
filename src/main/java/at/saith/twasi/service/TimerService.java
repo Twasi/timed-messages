@@ -140,6 +140,9 @@ public class TimerService implements IService {
     }
 
     public TimerEntity removeTimer(TwasiInterface twasiInterface, String command) throws TimerException{
+        if (command.startsWith(TimedMessagesPlugin.COMMAND_PREFIX)) {
+            command = command.substring(TimedMessagesPlugin.COMMAND_PREFIX.length());
+        }
         User user = twasiInterface.getStreamer().getUser();
 
         TimerEntity entity = getTimerEntityForUserAndCommand(user,command);
@@ -159,9 +162,12 @@ public class TimerService implements IService {
     }
 
     public void enableTimer(TwasiInterface twasiInterface, String command, boolean enabled) throws TimerException {
+        if (command.startsWith(TimedMessagesPlugin.COMMAND_PREFIX)) {
+            command = command.substring(TimedMessagesPlugin.COMMAND_PREFIX.length());
+        }
+
         User user = twasiInterface.getStreamer().getUser();
         TimerEntity entity = getTimerEntityForUserAndCommand(user, command);
-
         entity.setEnabled(enabled);
         repository.commit(entity);
 
