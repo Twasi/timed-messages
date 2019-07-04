@@ -8,8 +8,10 @@ import net.twasi.core.services.providers.config.ConfigService;
 
 
 public class TimedMessagesPlugin extends TwasiPlugin {
+
     public static final String COMMAND_PREFIX = ServiceRegistry.get(ConfigService.class).getCatalog().bot.prefix;
     public static TimerService SERVICE;
+
     @Override
     public void onActivate() {
         ServiceRegistry.register(new TimerService());

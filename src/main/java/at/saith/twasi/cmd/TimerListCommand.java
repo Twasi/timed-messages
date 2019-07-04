@@ -12,6 +12,7 @@ import net.twasi.core.translations.renderer.TranslationRenderer;
 import java.util.List;
 
 public class TimerListCommand extends TwasiSubCommand {
+
     public TimerListCommand(TwasiCustomCommandEvent event, ISubCommands parent) {
         super(event, parent);
     }

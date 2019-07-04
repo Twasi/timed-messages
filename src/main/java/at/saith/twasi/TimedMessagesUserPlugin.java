@@ -15,6 +15,7 @@ import net.twasiplugin.dependency.streamtracker.events.StreamTrackEvent;
 
 
 public class TimedMessagesUserPlugin extends TwasiUserPlugin {
+
     public TimedMessagesUserPlugin() {
         registerCommand(TimerCommand.class);
     }

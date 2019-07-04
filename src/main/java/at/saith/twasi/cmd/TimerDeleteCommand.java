@@ -12,6 +12,7 @@ import net.twasi.core.translations.renderer.TranslationRenderer;
 import java.util.List;
 
 public class TimerDeleteCommand extends TwasiSubCommand {
+
     public TimerDeleteCommand(TwasiCustomCommandEvent event, ISubCommands parent) {
         super(event, parent);
     }
@@ -29,9 +30,9 @@ public class TimerDeleteCommand extends TwasiSubCommand {
                 service.removeTimer(event.getTwasiInterface(), command);
                 event.reply(renderer.render("timer.delete.success"));
                 return true;
-            }catch (TimerNotFoundException e){
+            } catch (TimerNotFoundException e) {
                 event.reply(renderer.render("timer.error.notfound"));
-            }catch (Exception e) {
+            } catch (Exception e) {
                 //Shouldn't be executed
                 event.reply(renderer.render("timer.error.unexpected"));
                 e.printStackTrace();
