@@ -1,9 +1,10 @@
 package at.saith.twasi.database;
 
-import jdk.nashorn.internal.ir.annotations.Reference;
+
 import net.twasi.core.database.models.BaseEntity;
 import net.twasi.core.database.models.User;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Reference;
 
 @Entity(value = "timers", noClassnameStored = true)
 public class TimerEntity extends BaseEntity {
