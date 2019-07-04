@@ -26,15 +26,20 @@ public class TwasiTimer extends Timer {
         this.command = command;
         this.enabled = enabled;
         this.interval = interval;
-        if (enabled) start();
+        if (enabled) {
+            start();
+        }
     }
 
     public void start() {
+
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 if (!enabled) cancel();
-                if (!TimedMessagesPlugin.SERVICE.commandExists(twasiInterface, command)) disable();
+                if (!TimedMessagesPlugin.SERVICE.commandExists(twasiInterface, command)) {
+                    disable();
+                }
                 dispatchCommand();
             }
         };
@@ -47,10 +52,6 @@ public class TwasiTimer extends Timer {
         cancel();
     }
 
-    public void enable() {
-        this.enabled = true;
-        start();
-    }
 
     private void dispatchCommand() {
         TwitchAccount twitchAccount = twasiInterface.getStreamer().getUser().getTwitchAccount();

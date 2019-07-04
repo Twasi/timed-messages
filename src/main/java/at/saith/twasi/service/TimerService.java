@@ -8,7 +8,6 @@ import net.twasi.core.database.models.User;
 import net.twasi.core.interfaces.api.TwasiInterface;
 import net.twasi.core.logger.TwasiLogger;
 import net.twasi.core.models.Streamer;
-import net.twasi.core.plugin.api.TwasiUserPlugin;
 import net.twasi.core.plugin.api.customcommands.TwasiCustomCommand;
 import net.twasi.core.services.IService;
 import net.twasi.core.services.ServiceRegistry;
@@ -94,6 +93,7 @@ public class TimerService implements IService {
 
     public List<TwasiTimer> getRunningTimersForUser(User user) {
         List<TwasiTimer> timers = this.registeredTimers.get(user.getId());
+
         return timers != null ? timers : new ArrayList<>();
     }
 
@@ -132,8 +132,8 @@ public class TimerService implements IService {
         timer = new TimerEntity(user, command, interval, true);
         repository.add(timer);
 
-        TwasiLogger.log.debug("Timer for the command "+command+" was registered.");
         if (hasTimersEnabled(user)) {
+            TwasiLogger.log.debug("Timer for the command "+command+" was registered.");
             registeredTimers.get(user.getId()).add(new TwasiTimer(twasiInterface, command, interval, true));
         }
         return timer;
@@ -141,11 +141,12 @@ public class TimerService implements IService {
 
     public TimerEntity removeTimer(TwasiInterface twasiInterface, String command) throws TimerException{
         User user = twasiInterface.getStreamer().getUser();
-        TimerEntity entity = getTimerEntityForUserAndCommand(user,command);
 
+        TimerEntity entity = getTimerEntityForUserAndCommand(user,command);
         if(hasTimersEnabled(user)){
             List<TwasiTimer> timers = getRunningTimersForUser(user);
             for(TwasiTimer timer:timers){
+                System.out.println(timer.getCommand());
                 if(timer.getCommand().equalsIgnoreCase(command)){
                     timer.disable();
                     timers.remove(timer);
@@ -165,14 +166,17 @@ public class TimerService implements IService {
         repository.commit(entity);
 
         if (hasTimersEnabled(user)) {
+            if(enabled){
+                TwasiTimer timer = new TwasiTimer(twasiInterface,command,entity.getInterval(),true);
+                List<TwasiTimer> timers = this.registeredTimers.get(user.getId());
+                timers.add(timer);
+                return;
+            }
             List<TwasiTimer> timers = getRunningTimersForUser(user);
             for (TwasiTimer timer : timers) {
                 if (timer.getCommand().equalsIgnoreCase(command)) {
-                    if (enabled) {
-                        timer.enable();
-                    } else {
+                        getRunningTimersForUser(user).remove(timer);
                         timer.disable();
-                    }
                     return;
                 }
             }
@@ -187,6 +191,8 @@ public class TimerService implements IService {
         }
         for (CustomCommand cmd : commandRepository.getAllCommands(twasiInterface.getStreamer().getUser())) {
             if (cmd.getName().equalsIgnoreCase(command)) {
+                return true;
+            }else if(cmd.getName().startsWith(TimedMessagesPlugin.COMMAND_PREFIX)&&cmd.getName().equalsIgnoreCase(TimedMessagesPlugin.COMMAND_PREFIX+command)){
                 return true;
             }
         }
