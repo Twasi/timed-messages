@@ -1,0 +1,27 @@
+timer.syntax=!timer [add|delete|enable|disable|list]
+timer.enabled=aktiviert
+timer.disabled=deaktiviert
+
+timer.add.syntax=!timer add [command] [Interval in Minuten]
+timer.add.success=Der Timer für den Command {command} wurde erfolgreich hinzugefügt.
+
+timer.delete.syntax=!timer del [command]
+timer.delete.success=Der Timer für den Command {command} wurde erfolgreich entfernt.
+
+timer.list.syntax=!timer list
+timer.list.success=Es existieren folgende Timer: {timers}
+timer.list.empty=Es existieren keine Timer.
+
+timer.enable.success=Der Timer {command} wurde {enabled}.
+timer.enable.syntax=!timer [enable|disable] [command]
+
+timer.error.alreadyexists=Es existiert bereits ein Timer für den Command {command}.
+timer.error.notfound=Es exisitiert kein Timer für den Command {command}.
+timer.error.unexpected=Es ist ein unerwarteter Fehler aufgetreten.
+
+timer.error.command.notfound=Der Command {command} existiert nicht.
+timer.error.command.notallowed=Der Command {command} unterstützt keine Timer.
+
+
+timer.error.interval.notanumber=Das gegebene Interval ist keine Zahl. 4Head
+timer.error.interval.toolow=Das gegebene Interval ist zu klein.
