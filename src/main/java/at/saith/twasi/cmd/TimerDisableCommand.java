@@ -6,6 +6,7 @@ import net.twasi.core.plugin.api.customcommands.structuredcommands.subcommands.I
 import net.twasi.core.plugin.api.customcommands.structuredcommands.subcommands.TwasiSubCommand;
 
 public class TimerDisableCommand extends TwasiSubCommand {
+
     public TimerDisableCommand(TwasiCustomCommandEvent event, ISubCommands parent) {
         super(event, parent);
     }

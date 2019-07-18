@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TimerService implements IService {
+
     private final HashMap<ObjectId, List<TwasiTimer>> registeredTimers;
     private final TimerRepository repository;
     private final CommandRepository commandRepository;
@@ -76,12 +77,12 @@ public class TimerService implements IService {
         return null;
     }
 
-    public TimerEntity getTimerEntityForUserAndCommand(User user, String command) throws TimerException{
+    public TimerEntity getTimerEntityForUserAndCommand(User user, String command) throws TimerException {
         for (TimerEntity entity : getTimersForUser(user)) {
             if (entity.getCommand().equalsIgnoreCase(command)) return entity;
         }
 
-        throw new TimerNotFoundException("The timer for the command " + command + " and the user"+user.getTwitchAccount().getDisplayName()+" doesn't exist.");
+        throw new TimerNotFoundException("The timer for the command " + command + " and the user" + user.getTwitchAccount().getDisplayName() + " doesn't exist.");
     }
 
     public List<TimerEntity> getTimersForUser(User user) {
@@ -133,24 +134,21 @@ public class TimerService implements IService {
         repository.add(timer);
 
         if (hasTimersEnabled(user)) {
-            TwasiLogger.log.debug("Timer for the command "+command+" was registered.");
+            TwasiLogger.log.debug("Timer for the command " + command + " was registered.");
             registeredTimers.get(user.getId()).add(new TwasiTimer(twasiInterface, command, interval, true));
         }
         return timer;
     }
 
-    public TimerEntity removeTimer(TwasiInterface twasiInterface, String command) throws TimerException{
-        if (command.startsWith(TimedMessagesPlugin.COMMAND_PREFIX)) {
-            command = command.substring(TimedMessagesPlugin.COMMAND_PREFIX.length());
-        }
+    public TimerEntity removeTimer(TwasiInterface twasiInterface, String command) throws TimerException {
         User user = twasiInterface.getStreamer().getUser();
 
-        TimerEntity entity = getTimerEntityForUserAndCommand(user,command);
-        if(hasTimersEnabled(user)){
+        TimerEntity entity = getTimerEntityForUserAndCommand(user, command);
+        if (hasTimersEnabled(user)) {
             List<TwasiTimer> timers = getRunningTimersForUser(user);
-            for(TwasiTimer timer:timers){
+            for (TwasiTimer timer : timers) {
                 System.out.println(timer.getCommand());
-                if(timer.getCommand().equalsIgnoreCase(command)){
+                if (timer.getCommand().equalsIgnoreCase(command)) {
                     timer.disable();
                     timers.remove(timer);
                     break;
@@ -172,8 +170,8 @@ public class TimerService implements IService {
         repository.commit(entity);
 
         if (hasTimersEnabled(user)) {
-            if(enabled){
-                TwasiTimer timer = new TwasiTimer(twasiInterface,command,entity.getInterval(),true);
+            if (enabled) {
+                TwasiTimer timer = new TwasiTimer(twasiInterface, command, entity.getInterval(), true);
                 List<TwasiTimer> timers = this.registeredTimers.get(user.getId());
                 timers.add(timer);
                 return;
@@ -181,8 +179,8 @@ public class TimerService implements IService {
             List<TwasiTimer> timers = getRunningTimersForUser(user);
             for (TwasiTimer timer : timers) {
                 if (timer.getCommand().equalsIgnoreCase(command)) {
-                        getRunningTimersForUser(user).remove(timer);
-                        timer.disable();
+                    getRunningTimersForUser(user).remove(timer);
+                    timer.disable();
                     return;
                 }
             }
@@ -198,7 +196,7 @@ public class TimerService implements IService {
         for (CustomCommand cmd : commandRepository.getAllCommands(twasiInterface.getStreamer().getUser())) {
             if (cmd.getName().equalsIgnoreCase(command)) {
                 return true;
-            }else if(cmd.getName().startsWith(TimedMessagesPlugin.COMMAND_PREFIX)&&cmd.getName().equalsIgnoreCase(TimedMessagesPlugin.COMMAND_PREFIX+command)){
+            } else if (cmd.getName().startsWith(TimedMessagesPlugin.COMMAND_PREFIX) && cmd.getName().equalsIgnoreCase(TimedMessagesPlugin.COMMAND_PREFIX + command)) {
                 return true;
             }
         }

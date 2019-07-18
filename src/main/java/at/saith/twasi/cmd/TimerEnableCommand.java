@@ -11,6 +11,7 @@ import net.twasi.core.services.ServiceRegistry;
 import net.twasi.core.translations.renderer.TranslationRenderer;
 
 public class TimerEnableCommand extends TwasiSubCommand {
+
     public TimerEnableCommand(TwasiCustomCommandEvent event, ISubCommands parent) {
         super(event, parent);
     }
@@ -29,7 +30,7 @@ public class TimerEnableCommand extends TwasiSubCommand {
             try {
                 String enabledString = enabled ? renderer.render("timer.enabled") : renderer.render("timer.disabled");
                 service.enableTimer(event.getTwasiInterface(), command, enabled);
-                renderer.bind("command",command);
+                renderer.bind("command", command);
                 renderer.bind("enabled", enabledString);
                 event.reply(renderer.render("timer.enable.success"));
                 return true;

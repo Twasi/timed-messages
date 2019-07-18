@@ -14,6 +14,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class TwasiTimer extends Timer {
+
     private TwasiInterface twasiInterface;
     private String command;
     private int interval;
