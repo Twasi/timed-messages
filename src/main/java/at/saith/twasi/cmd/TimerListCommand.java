@@ -2,6 +2,7 @@ package at.saith.twasi.cmd;
 
 import at.saith.twasi.database.TimerEntity;
 import at.saith.twasi.service.TimerService;
+import at.saith.twasi.util.TimeFormatter;
 import net.twasi.core.plugin.api.customcommands.TwasiCustomCommandEvent;
 import net.twasi.core.plugin.api.customcommands.structuredcommands.TwasiStructuredCommandEvent;
 import net.twasi.core.plugin.api.customcommands.structuredcommands.subcommands.ISubCommands;
@@ -27,7 +28,7 @@ public class TimerListCommand extends TwasiSubCommand {
             StringBuilder timersBuilder = new StringBuilder();
             for (TimerEntity timer : timers) {
                 String enabled = timer.isEnabled() ? renderer.render("timer.enabled") : renderer.render("timer.disabled");
-                timersBuilder.append(timer.getCommand() + "(" + timer.getInterval() + ", " + enabled + "), ");
+                timersBuilder.append(timer.getCommand() + "(" + TimeFormatter.formatTime(timer.getInterval()) + ", " + enabled + "), ");
             }
             if (timersBuilder.length() < 2) {
                 event.reply(renderer.render("timer.list.empty"));
