@@ -40,7 +40,7 @@ public class TimerDeleteCommand extends TwasiSubCommand {
 
             return false;
         } else {
-            event.reply(renderer.render("timer.delete.syntax"));
+            super.handle(event);
             return false;
         }
     }

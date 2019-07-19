@@ -25,13 +25,6 @@ public class TimerCommand extends StructuredPluginCommand {
     }
 
     @Override
-    protected boolean handle(TwasiCustomCommandEvent event) {
-        TranslationRenderer renderer = event.getRenderer();
-        event.reply(renderer.render("timer.syntax"));
-        return true;
-    }
-
-    @Override
     public String getCommandName() {
         return "timer";
     }

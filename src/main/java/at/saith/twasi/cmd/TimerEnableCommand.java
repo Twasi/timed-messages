@@ -21,7 +21,7 @@ public class TimerEnableCommand extends TwasiSubCommand {
         return handleEnableCommand(event);
     }
 
-    public static boolean handleEnableCommand(TwasiStructuredCommandEvent event) {
+    static boolean handleEnableCommand(TwasiStructuredCommandEvent event) {
         TranslationRenderer renderer = event.getRenderer();
         TimerService service = ServiceRegistry.get(TimerService.class);
         if (event.hasArgs() && event.getArgs().size() == 1) {

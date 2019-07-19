@@ -53,7 +53,7 @@ public class TimerAddCommand extends TwasiSubCommand {
 
             return false;
         } else {
-            event.reply(renderer.render("timer.add.syntax"));
+            super.handle(event);
             return false;
         }
     }

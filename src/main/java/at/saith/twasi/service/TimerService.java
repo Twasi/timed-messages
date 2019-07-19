@@ -119,13 +119,9 @@ public class TimerService implements IService {
 
         if (!exists) throw new CommandNotFoundException("The Command " + command + "doesn't exist.");
 
-        for (TwasiCustomCommand cmd : twasiInterface.getCustomCommands()) {
-            if (cmd.getCommandName().equalsIgnoreCase(command)) {
-                if (!cmd.allowsTimer())
-                    throw new NotAllowedTimerException("The command " + cmd.getCommandName() + " doesn't allow timers!");
-                break;
-            }
-        }
+        TwasiCustomCommand cmd = twasiInterface.getCustomCommands().stream().filter(c -> c.getCommandName().equalsIgnoreCase(command)).findFirst().get();
+        if (!cmd.allowsTimer())
+            throw new NotAllowedTimerException("The command " + cmd.getCommandName() + " doesn't allow timers!");
 
         timer = new TimerEntity(user, command, interval, true);
         repository.add(timer);
@@ -157,7 +153,7 @@ public class TimerService implements IService {
 
     public void enableTimer(TwasiInterface twasiInterface, String command, boolean enabled) throws TimerException {
         User user = twasiInterface.getStreamer().getUser();
-        
+
         TimerEntity entity = getTimerEntityForUserAndCommand(user, command);
         entity.setEnabled(enabled);
 
@@ -181,17 +177,13 @@ public class TimerService implements IService {
         }
     }
 
-    public boolean commandExists(TwasiInterface twasiInterface, String command) {
-        for (TwasiCustomCommand cmd : twasiInterface.getCustomCommands()) {
-            if (cmd.getCommandName().equalsIgnoreCase(command)) {
-                return true;
-            }
-        }
-        for (CustomCommand cmd : commandRepository.getAllCommands(twasiInterface.getStreamer().getUser())) {
-            if (cmd.getName().equalsIgnoreCase(command)) {
-                return true;
-            }
-        }
-        return false;
+    boolean commandExists(TwasiInterface twasiInterface, String command) {
+        return
+                twasiInterface
+                        .getCustomCommands()
+                        .stream().anyMatch(cmd -> cmd.getCommandName().equalsIgnoreCase(command))
+                        || commandRepository
+                        .getAllCommands(twasiInterface.getStreamer().getUser())
+                        .stream().anyMatch(cmd -> cmd.getName().equalsIgnoreCase(command));
     }
 }
