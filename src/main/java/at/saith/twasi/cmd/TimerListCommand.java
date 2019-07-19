@@ -38,7 +38,7 @@ public class TimerListCommand extends TwasiSubCommand {
             }
             return true;
         } else {
-            event.reply(renderer.render("timer.list.syntax"));
+            super.handle(event);
         }
         return false;
     }
