@@ -1,6 +1,7 @@
 package at.saith.twasi.service;
 
 import at.saith.twasi.TimedMessagesPlugin;
+import at.saith.twasi.util.TimeFormatter;
 import net.twasi.core.database.models.TwitchAccount;
 import net.twasi.core.database.models.permissions.PermissionGroups;
 import net.twasi.core.interfaces.api.TwasiInterface;
@@ -57,7 +58,7 @@ public class TwasiTimer extends Timer {
     private void dispatchCommand() {
         TwitchAccount twitchAccount = twasiInterface.getStreamer().getUser().getTwitchAccount();
         twasiInterface.getDispatcher().dispatch(new TwasiMessage(
-                TimedMessagesPlugin.COMMAND_PREFIX + command,
+                command,
                 MessageType.PRIVMSG,
                 new TwitchAccount(
                         twitchAccount.getUserName(),

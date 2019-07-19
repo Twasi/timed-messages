@@ -103,9 +103,6 @@ public class TimerService implements IService {
     }
 
     public TimerEntity registerTimer(TwasiInterface twasiInterface, String command, int interval) throws TimerException {
-        if (command.startsWith(TimedMessagesPlugin.COMMAND_PREFIX)) {
-            command = command.substring(TimedMessagesPlugin.COMMAND_PREFIX.length());
-        }
         Streamer streamer = twasiInterface.getStreamer();
         User user = streamer.getUser();
 
@@ -147,7 +144,6 @@ public class TimerService implements IService {
         if (hasTimersEnabled(user)) {
             List<TwasiTimer> timers = getRunningTimersForUser(user);
             for (TwasiTimer timer : timers) {
-                System.out.println(timer.getCommand());
                 if (timer.getCommand().equalsIgnoreCase(command)) {
                     timer.disable();
                     timers.remove(timer);
@@ -160,13 +156,11 @@ public class TimerService implements IService {
     }
 
     public void enableTimer(TwasiInterface twasiInterface, String command, boolean enabled) throws TimerException {
-        if (command.startsWith(TimedMessagesPlugin.COMMAND_PREFIX)) {
-            command = command.substring(TimedMessagesPlugin.COMMAND_PREFIX.length());
-        }
-
         User user = twasiInterface.getStreamer().getUser();
+        
         TimerEntity entity = getTimerEntityForUserAndCommand(user, command);
         entity.setEnabled(enabled);
+
         repository.commit(entity);
 
         if (hasTimersEnabled(user)) {
@@ -195,8 +189,6 @@ public class TimerService implements IService {
         }
         for (CustomCommand cmd : commandRepository.getAllCommands(twasiInterface.getStreamer().getUser())) {
             if (cmd.getName().equalsIgnoreCase(command)) {
-                return true;
-            } else if (cmd.getName().startsWith(TimedMessagesPlugin.COMMAND_PREFIX) && cmd.getName().equalsIgnoreCase(TimedMessagesPlugin.COMMAND_PREFIX + command)) {
                 return true;
             }
         }
