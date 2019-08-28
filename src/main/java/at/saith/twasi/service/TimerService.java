@@ -1,6 +1,5 @@
 package at.saith.twasi.service;
 
-import at.saith.twasi.TimedMessagesPlugin;
 import at.saith.twasi.database.TimerEntity;
 import at.saith.twasi.database.TimerRepository;
 import at.saith.twasi.service.exception.*;
@@ -12,8 +11,7 @@ import net.twasi.core.plugin.api.customcommands.TwasiCustomCommand;
 import net.twasi.core.services.IService;
 import net.twasi.core.services.ServiceRegistry;
 import net.twasi.core.services.providers.DataService;
-import net.twasiplugin.commands.CommandRepository;
-import net.twasiplugin.commands.CustomCommand;
+import net.twasiplugin.commands.database.CommandRepository;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
