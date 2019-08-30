@@ -1,3 +1,5 @@
+plugin.name=Zeitgesteuerte Nachrichten
+
 timer.syntax=!timer [add|delete|enable|disable|list]
 timer.enabled=aktiviert
 timer.disabled=deaktiviert

@@ -1,4 +1,4 @@
-name: "Timed Messages"
+name: "TimedMessages"
 main: at.saith.twasi.TimedMessagesPlugin
 version: 1.0
 description:  "Adds timers to your stream."
