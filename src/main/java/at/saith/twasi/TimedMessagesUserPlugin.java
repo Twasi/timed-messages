@@ -1,9 +1,7 @@
 package at.saith.twasi;
 
 import at.saith.twasi.cmd.TimerCommand;
-import net.twasi.core.database.models.User;
 import net.twasi.core.events.TwasiEventHandler;
-import net.twasi.core.logger.TwasiLogger;
 import net.twasi.core.plugin.api.TwasiUserPlugin;
 import net.twasi.core.plugin.api.events.TwasiDisableEvent;
 import net.twasi.core.plugin.api.events.TwasiEnableEvent;
