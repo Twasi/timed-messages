@@ -1,22 +1,26 @@
 package at.saith.twasi.service;
 
+import at.saith.twasi.TimedMessagesPlugin;
 import at.saith.twasi.database.TimerEntity;
 import at.saith.twasi.database.TimerRepository;
 import at.saith.twasi.service.exception.*;
 import net.twasi.core.database.models.User;
 import net.twasi.core.interfaces.api.TwasiInterface;
 import net.twasi.core.logger.TwasiLogger;
+import net.twasi.core.models.Message.TwasiCommand;
 import net.twasi.core.models.Streamer;
 import net.twasi.core.plugin.api.customcommands.TwasiCustomCommand;
 import net.twasi.core.services.IService;
 import net.twasi.core.services.ServiceRegistry;
 import net.twasi.core.services.providers.DataService;
 import net.twasiplugin.commands.database.CommandRepository;
+import net.twasiplugin.commands.database.CustomCommand;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class TimerService implements IService {
 
@@ -117,9 +121,15 @@ public class TimerService implements IService {
 
         if (!exists) throw new CommandNotFoundException("The Command " + command + "doesn't exist.");
 
-        TwasiCustomCommand cmd = twasiInterface.getCustomCommands().stream().filter(c -> c.getCommandName().equalsIgnoreCase(command)).findFirst().get();
-        if (!cmd.allowsTimer())
-            throw new NotAllowedTimerException("The command " + cmd.getCommandName() + " doesn't allow timers!");
+        final String commandName = command; //Have to make a new Variable because it might change later
+
+        Optional<TwasiCustomCommand> cmd = twasiInterface.getCustomCommands().stream().filter(c -> c.getCommandName().equalsIgnoreCase(commandName)).findFirst();
+        if (cmd.isPresent() && !cmd.get().allowsTimer())
+            throw new NotAllowedTimerException("The command " + cmd.get().getCommandName() + " doesn't allow timers!");
+
+        if (cmd.isPresent() && !command.startsWith(TimedMessagesPlugin.COMMAND_PREFIX)) {
+            command = TimedMessagesPlugin.COMMAND_PREFIX + command;
+        }
 
         timer = new TimerEntity(user, command, interval, true);
         repository.add(timer);
@@ -179,7 +189,7 @@ public class TimerService implements IService {
         return
                 twasiInterface
                         .getCustomCommands()
-                        .stream().anyMatch(cmd -> cmd.getCommandName().equalsIgnoreCase(command))
+                        .stream().anyMatch(cmd -> cmd.getCommandName().equalsIgnoreCase(command) || cmd.getFormattedCommandName().equalsIgnoreCase(command))
                         || commandRepository
                         .getAllCommands(twasiInterface.getStreamer().getUser())
                         .stream().anyMatch(cmd -> cmd.getName().equalsIgnoreCase(command));
