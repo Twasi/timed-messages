@@ -7,14 +7,11 @@ import at.saith.twasi.service.exception.*;
 import net.twasi.core.database.models.User;
 import net.twasi.core.interfaces.api.TwasiInterface;
 import net.twasi.core.logger.TwasiLogger;
-import net.twasi.core.models.Message.TwasiCommand;
-import net.twasi.core.models.Streamer;
 import net.twasi.core.plugin.api.customcommands.TwasiCustomCommand;
 import net.twasi.core.services.IService;
 import net.twasi.core.services.ServiceRegistry;
 import net.twasi.core.services.providers.DataService;
 import net.twasiplugin.commands.database.CommandRepository;
-import net.twasiplugin.commands.database.CustomCommand;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
@@ -39,7 +36,7 @@ public class TimerService implements IService {
         User user = twasiInterface.getStreamer().getUser();
         TwasiLogger.log.debug("Starting timers for user " + user.getTwitchAccount().getDisplayName());
 
-        stopTimers(twasiInterface);
+        stopTimers(user);
 
         List<TwasiTimer> timers = new ArrayList<>();
         registeredTimers.put(user.getId(), timers);
@@ -49,8 +46,7 @@ public class TimerService implements IService {
         }
     }
 
-    public void stopTimers(TwasiInterface twasiInterface) {
-        User user = twasiInterface.getStreamer().getUser();
+    public void stopTimers(User user) {
         TwasiLogger.log.debug("Starting timers for user " + user.getTwitchAccount().getDisplayName());
 
         List<TwasiTimer> runningTimers = getRunningTimersForUser(user);
@@ -105,8 +101,7 @@ public class TimerService implements IService {
     }
 
     public TimerEntity registerTimer(TwasiInterface twasiInterface, String command, int interval) throws TimerException {
-        Streamer streamer = twasiInterface.getStreamer();
-        User user = streamer.getUser();
+        User user = twasiInterface.getStreamer().getUser();
 
         TwasiLogger.log.debug("Trying to register new timer for user " + user.getTwitchAccount().getDisplayName() + " for the command " + command);
 
@@ -159,7 +154,7 @@ public class TimerService implements IService {
         return entity;
     }
 
-    public void enableTimer(TwasiInterface twasiInterface, String command, boolean enabled) throws TimerException {
+    public TimerEntity enableTimer(TwasiInterface twasiInterface, String command, boolean enabled) throws TimerException {
         User user = twasiInterface.getStreamer().getUser();
 
         TimerEntity entity = getTimerEntityForUserAndCommand(user, command);
@@ -172,17 +167,18 @@ public class TimerService implements IService {
                 TwasiTimer timer = new TwasiTimer(twasiInterface, command, entity.getInterval(), true);
                 List<TwasiTimer> timers = this.registeredTimers.get(user.getId());
                 timers.add(timer);
-                return;
+                return entity;
             }
             List<TwasiTimer> timers = getRunningTimersForUser(user);
             for (TwasiTimer timer : timers) {
                 if (timer.getCommand().equalsIgnoreCase(command)) {
                     getRunningTimersForUser(user).remove(timer);
                     timer.disable();
-                    return;
+                    return entity;
                 }
             }
         }
+        return null;
     }
 
     boolean commandExists(TwasiInterface twasiInterface, String command) {
