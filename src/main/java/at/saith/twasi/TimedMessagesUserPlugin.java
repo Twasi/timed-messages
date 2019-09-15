@@ -50,13 +50,13 @@ public class TimedMessagesUserPlugin extends TwasiUserPlugin {
         sts.registerStreamStopEvent(getTwasiInterface().getStreamer().getUser(), new TwasiEventHandler<StreamStopEvent>() {
             @Override
             public void on(StreamStopEvent streamStopEvent) {
-                TimedMessagesPlugin.SERVICE.stopTimers(TimedMessagesUserPlugin.this.getTwasiInterface());
+                TimedMessagesPlugin.SERVICE.stopTimers(TimedMessagesUserPlugin.this.getTwasiInterface().getStreamer().getUser());
             }
         });
     }
 
     @Override
     public void onDisable(TwasiDisableEvent e) {
-        TimedMessagesPlugin.SERVICE.stopTimers(this.getTwasiInterface());
+        TimedMessagesPlugin.SERVICE.stopTimers(this.getTwasiInterface().getStreamer().getUser());
     }
 }

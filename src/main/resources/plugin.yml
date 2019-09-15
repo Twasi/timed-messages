@@ -15,3 +15,16 @@ permissions:
   - timer.list
   - timer.enable
   - timer.disable
+
+api: |
+  type TimedMessages {
+    listTimers(): [Timer],
+    registerTimer(command: String, interval: Int): Timer,
+    removeTimer(command: String): Timer,
+    enableTimer(command: String, enabled: Boolean): Timer
+  }
+  type Timer {
+    command: String,
+    enabled: Boolean,
+    interval: Int
+  }
