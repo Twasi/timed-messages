@@ -1,6 +1,6 @@
 package at.saith.twasi.api;
 
-import at.saith.twasi.api.models.TimedMessagesDTO;
+import at.saith.twasi.api.model.TimedMessagesDTO;
 import net.twasi.core.database.models.User;
 import net.twasi.core.graphql.TwasiCustomResolver;
 
