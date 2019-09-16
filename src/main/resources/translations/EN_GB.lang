@@ -1,6 +1,6 @@
 plugin.name=Timed Messages
 
-timer.syntax=!timer [add|delete|enable|disable|list]
+timer.syntax=!timer [add | delete | enable | disable | list]
 timer.enabled=enabled
 timer.disabled=disabled
 
