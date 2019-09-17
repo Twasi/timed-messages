@@ -22,16 +22,16 @@ public class TimedMessagesDTO {
         return TimedMessagesPlugin.SERVICE.getTimersForUser(twasiInterface.getStreamer().getUser());
     }
 
-    public TimerEntity registerTimer(String command, int interval) {
+    public TimerEntity registerTimer(String command, int interval, boolean enabled) {
         try {
-            return TimedMessagesPlugin.SERVICE.registerTimer(twasiInterface, command, interval);
+            return TimedMessagesPlugin.SERVICE.registerTimer(twasiInterface, command, interval, enabled);
         } catch (Exception e) {
             throwGraphQLExcetion(e);
         }
         return null;
     }
 
-    public TimerEntity removeTimer(String command) throws TimerException {
+    public TimerEntity removeTimer(String command) {
         try {
             return TimedMessagesPlugin.SERVICE.removeTimer(twasiInterface, command);
         } catch (Exception e) {
@@ -40,9 +40,18 @@ public class TimedMessagesDTO {
         return null;
     }
 
-    public TimerEntity enableTimer(String command, boolean enabled) throws TimerException {
+    public TimerEntity enableTimer(String command, boolean enabled) {
         try {
             return TimedMessagesPlugin.SERVICE.enableTimer(twasiInterface, command, enabled);
+        } catch (Exception e) {
+            throwGraphQLExcetion(e);
+        }
+        return null;
+    }
+
+    public TimerEntity updateTimer(String command, String newCommand, int newInterval, boolean enabled) {
+        try {
+            return TimedMessagesPlugin.SERVICE.updateTimer(twasiInterface, command, newCommand, newInterval, enabled);
         } catch (Exception e) {
             throwGraphQLExcetion(e);
         }
@@ -58,8 +67,9 @@ public class TimedMessagesDTO {
             throw new TwasiGraphQLHandledException(e.getMessage(), "timer.error.command.notfound");
         } else if (e instanceof NotAllowedTimerException) {
             throw new TwasiGraphQLHandledException(e.getMessage(), "timer.error.command.notallowed");
-        } else if (e instanceof Exception) {
+        } else {
             //Shouldn't be executed
+            e.printStackTrace();
             throw new TwasiGraphQLHandledException("", "timer.error.unexpected");
         }
     }

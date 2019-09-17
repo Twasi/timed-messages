@@ -46,4 +46,8 @@ public class TimerEntity extends BaseEntity {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+    public void setInterval(int interval){
+        this.interval = interval;
+    }
 }

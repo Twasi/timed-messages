@@ -1,7 +1,10 @@
 package at.saith.twasi.cmd;
 
 import at.saith.twasi.service.TimerService;
-import at.saith.twasi.service.exception.*;
+import at.saith.twasi.service.exception.CommandNotFoundException;
+import at.saith.twasi.service.exception.NotAllowedTimerException;
+import at.saith.twasi.service.exception.TimerAlreadyExistsException;
+import at.saith.twasi.service.exception.TooLowIntervalException;
 import net.twasi.core.plugin.api.customcommands.TwasiCustomCommandEvent;
 import net.twasi.core.plugin.api.customcommands.structuredcommands.TwasiStructuredCommandEvent;
 import net.twasi.core.plugin.api.customcommands.structuredcommands.subcommands.ISubCommands;
@@ -20,21 +23,34 @@ public class TimerAddCommand extends TwasiSubCommand {
     @Override
     protected boolean handle(TwasiStructuredCommandEvent event) {
         TranslationRenderer renderer = event.getRenderer();
+
         List<String> args = event.getArgs();
-        if (event.hasArgs() && args.size() == 2) {
+        if (event.hasArgs() && args.size() >= 2 && args.size() < 4) {
             String command = args.get(0);
-            int interval;
+            long interval;
             try {
-                interval = Integer.parseInt(args.get(1)) * 60;//Multiply by 60 to get Minutes
+                interval = Long.parseLong(args.get(1)) * 60;//Multiply by 60 to get Minutes
+                if (interval > Integer.MAX_VALUE) {
+                    event.reply(renderer.render("timer.error.interval.toohigh"));
+                    return false;
+                }
             } catch (Exception e) {
                 event.reply(renderer.render("timer.error.interval.notanumber"));
                 return false;
+            }
+            boolean enabled = true;
+            if (args.size() == 3 && !args.get(2).equals(renderer.render("timer.enabled"))) {
+                if (args.get(2).equals(renderer.render("timer.disabled"))) {
+                    enabled = false;
+                } else {
+                    return super.handle(event);
+                }
             }
             renderer.bind("command", command);
             renderer.bind("interval", "" + interval);
             TimerService service = ServiceRegistry.get(TimerService.class);
             try {
-                service.registerTimer(event.getTwasiInterface(), command, interval);
+                service.registerTimer(event.getTwasiInterface(), command, (int) interval, enabled);
                 event.reply(renderer.render("timer.add.success"));
                 return true;
             } catch (TooLowIntervalException e) {
@@ -53,8 +69,7 @@ public class TimerAddCommand extends TwasiSubCommand {
 
             return false;
         } else {
-            super.handle(event);
-            return false;
+            return super.handle(event);
         }
     }
 

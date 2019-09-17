@@ -19,9 +19,10 @@ permissions:
 api: |
   type TimedMessages {
     listTimers: [Timer],
-    registerTimer(command: String, interval: Int): Timer,
+    registerTimer(command: String, interval: Int, enabled: Boolean): Timer,
     removeTimer(command: String): Timer,
-    enableTimer(command: String, enabled: Boolean): Timer
+    enableTimer(command: String, enabled: Boolean): Timer,
+    updateTimer(command: String, newCommand: String, newInterval: Int, enabled: Boolean): Timer
   }
   type Timer {
     command: String,
