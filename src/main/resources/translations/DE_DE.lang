@@ -4,7 +4,7 @@ timer.syntax=!timer [add | delete | enable | disable | list]
 timer.enabled=aktiviert
 timer.disabled=deaktiviert
 
-timer.add.syntax=!timer add [command] [Interval in Minuten]
+timer.add.syntax=!timer add [command] [Interval in Minuten] [aktiviert | deaktiviert]
 timer.add.success=Der Timer für den Command {command} wurde erfolgreich hinzugefügt.
 
 timer.delete.syntax=!timer del [command]
@@ -27,3 +27,4 @@ timer.error.command.notallowed=Der Command {command} unterstützt keine Timer.
 
 timer.error.interval.notanumber=Das gegebene Interval ist keine Zahl. 4Head
 timer.error.interval.toolow=Das gegebene Interval ist zu klein.
+timer.error.interval.toohigh=Das gegebene Interval ist zu groß. Beschränke dich bitte auf 35.791.394 Minuten.

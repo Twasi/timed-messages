@@ -75,11 +75,10 @@ public class TimerService implements IService {
         return null;
     }
 
-    public TimerEntity getTimerEntityForUserAndCommand(User user, String command) throws TimerException {
+    public TimerEntity getTimerEntityForUserAndCommand(User user, String command) throws TimerNotFoundException {
         for (TimerEntity entity : getTimersForUser(user)) {
             if (entity.getCommand().equalsIgnoreCase(command)) return entity;
         }
-
         throw new TimerNotFoundException("The timer for the command " + command + " and the user" + user.getTwitchAccount().getDisplayName() + " doesn't exist.");
     }
 
@@ -100,7 +99,7 @@ public class TimerService implements IService {
         return registeredTimers.get(user.getId()) != null;
     }
 
-    public TimerEntity registerTimer(TwasiInterface twasiInterface, String command, int interval) throws TimerException {
+    public TimerEntity registerTimer(TwasiInterface twasiInterface, String command, int interval, boolean enabled) throws TimerException {
         User user = twasiInterface.getStreamer().getUser();
 
         TwasiLogger.log.debug("Trying to register new timer for user " + user.getTwitchAccount().getDisplayName() + " for the command " + command);
@@ -108,13 +107,13 @@ public class TimerService implements IService {
         if (interval < 1)
             throw new TooLowIntervalException("The Interval " + interval + " is too low.");
 
-        TimerEntity timer = repository.getTimerForUserAndCommand(user, command);
-        if (timer != null) {
+
+        if (timerExists(user, command)) {
             throw new TimerAlreadyExistsException("A Timer for the command " + command + " already exists.");
         }
         boolean exists = commandExists(twasiInterface, command);
 
-        if (!exists) throw new CommandNotFoundException("The Command " + command + "doesn't exist.");
+        if (!exists) throw new CommandNotFoundException("The Command " + command + " doesn't exist.");
 
         final String commandName = command; //Have to make a new Variable because it might change later
 
@@ -126,12 +125,12 @@ public class TimerService implements IService {
             command = TimedMessagesPlugin.COMMAND_PREFIX + command;
         }
 
-        timer = new TimerEntity(user, command, interval, true);
+        TimerEntity timer = new TimerEntity(user, command, interval, enabled);
         repository.add(timer);
 
         if (hasTimersEnabled(user)) {
             TwasiLogger.log.debug("Timer for the command " + command + " was registered.");
-            registeredTimers.get(user.getId()).add(new TwasiTimer(twasiInterface, command, interval, true));
+            registeredTimers.get(user.getId()).add(new TwasiTimer(twasiInterface, command, interval, enabled));
         }
         return timer;
     }
@@ -141,17 +140,23 @@ public class TimerService implements IService {
 
         TimerEntity entity = getTimerEntityForUserAndCommand(user, command);
         if (hasTimersEnabled(user)) {
-            List<TwasiTimer> timers = getRunningTimersForUser(user);
-            for (TwasiTimer timer : timers) {
-                if (timer.getCommand().equalsIgnoreCase(command)) {
-                    timer.disable();
-                    timers.remove(timer);
-                    break;
-                }
-            }
+            disableTimer(user, command);
         }
         repository.remove(entity);
         return entity;
+    }
+
+    public TimerEntity updateTimer(TwasiInterface twasiInterface, String command, String newCommand, int newInterval, boolean enabled) throws TimerException {
+        if (command.equals(newCommand)) {
+            TimerEntity entity = enableTimer(twasiInterface, command, enabled);
+            entity.setInterval(newInterval);
+            repository.commit(entity);
+            return entity;
+        } else {
+            TimerEntity entity = registerTimer(twasiInterface, newCommand, newInterval, enabled);
+            removeTimer(twasiInterface, command);
+            return entity;
+        }
     }
 
     public TimerEntity enableTimer(TwasiInterface twasiInterface, String command, boolean enabled) throws TimerException {
@@ -167,18 +172,24 @@ public class TimerService implements IService {
                 TwasiTimer timer = new TwasiTimer(twasiInterface, command, entity.getInterval(), true);
                 List<TwasiTimer> timers = this.registeredTimers.get(user.getId());
                 timers.add(timer);
-                return entity;
-            }
-            List<TwasiTimer> timers = getRunningTimersForUser(user);
-            for (TwasiTimer timer : timers) {
-                if (timer.getCommand().equalsIgnoreCase(command)) {
-                    getRunningTimersForUser(user).remove(timer);
-                    timer.disable();
-                    return entity;
-                }
+            } else {
+                disableTimer(user, command);
             }
         }
-        return null;
+        return entity;
+    }
+
+    private void disableTimer(User user, String command) {
+        List<TwasiTimer> timers = getRunningTimersForUser(user);
+        Optional<TwasiTimer> timer = timers.stream().filter(t -> t.getCommand().equalsIgnoreCase(command)).findFirst();
+        if (!timer.isPresent()) return;
+
+        timer.get().disable();
+        timers.remove(timer.get());
+    }
+
+    public boolean timerExists(User user, String command) {
+        return repository.getTimerForUserAndCommand(user, command) != null;
     }
 
     boolean commandExists(TwasiInterface twasiInterface, String command) {
@@ -190,4 +201,6 @@ public class TimerService implements IService {
                         .getAllCommands(twasiInterface.getStreamer().getUser())
                         .stream().anyMatch(cmd -> cmd.getName().equalsIgnoreCase(command));
     }
+
+
 }
