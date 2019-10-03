@@ -40,14 +40,28 @@ public class TimerService implements IService {
 
         List<TwasiTimer> timers = new ArrayList<>();
         registeredTimers.put(user.getId(), timers);
+        List<TimerEntity> timerEntities = getTimersForUser(user);
+        int i = 0;
 
-        for (TimerEntity timer : getTimersForUser(user)) {
-            timers.add(new TwasiTimer(twasiInterface, timer.getCommand(), timer.getInterval(), timer.isEnabled()));
+        for (TimerEntity timer : timerEntities) {
+            startTimer(twasiInterface, timer.getCommand(), timer.getInterval(), timer.isEnabled(), i++ * 30);
+        }
+    }
+
+    private void startTimer(TwasiInterface twasiInterface, String command, int interval, boolean enabled, int initialDelay) {
+
+        User user = twasiInterface.getStreamer().getUser();
+        if (hasTimersEnabled(user)) {
+            List<TwasiTimer> timers = registeredTimers.get(user.getId());
+            timers.add(new TwasiTimer(twasiInterface, command, interval, enabled, initialDelay));
+            TwasiLogger.log.debug("Started timer " + command + " for User " + user.getTwitchAccount().getDisplayName());
+        } else {
+            TwasiLogger.log.debug("Tried to start timer " + command + " but User " + user.getTwitchAccount().getDisplayName() + " hasn't timers enabled.");
         }
     }
 
     public void stopTimers(User user) {
-        TwasiLogger.log.debug("Starting timers for user " + user.getTwitchAccount().getDisplayName());
+        TwasiLogger.log.debug("Stopping timers for user " + user.getTwitchAccount().getDisplayName());
 
         List<TwasiTimer> runningTimers = getRunningTimersForUser(user);
         runningTimers.forEach(TwasiTimer::disable);
@@ -127,11 +141,10 @@ public class TimerService implements IService {
 
         TimerEntity timer = new TimerEntity(user, command, interval, enabled);
         repository.add(timer);
+        TwasiLogger.log.debug("Timer for the command " + command + " was registered.");
 
-        if (hasTimersEnabled(user)) {
-            TwasiLogger.log.debug("Timer for the command " + command + " was registered.");
-            registeredTimers.get(user.getId()).add(new TwasiTimer(twasiInterface, command, interval, enabled));
-        }
+        startTimer(twasiInterface, command, interval, enabled, 0);
+
         return timer;
     }
 
@@ -167,25 +180,25 @@ public class TimerService implements IService {
 
         repository.commit(entity);
 
-        if (hasTimersEnabled(user)) {
-            if (enabled) {
-                TwasiTimer timer = new TwasiTimer(twasiInterface, command, entity.getInterval(), true);
-                List<TwasiTimer> timers = this.registeredTimers.get(user.getId());
-                timers.add(timer);
-            } else {
-                disableTimer(user, command);
-            }
+
+        if (enabled) {
+            startTimer(twasiInterface, command, entity.getInterval(), true, 0);
+        } else {
+            disableTimer(user, command);
         }
+
         return entity;
     }
 
     private void disableTimer(User user, String command) {
-        List<TwasiTimer> timers = getRunningTimersForUser(user);
-        Optional<TwasiTimer> timer = timers.stream().filter(t -> t.getCommand().equalsIgnoreCase(command)).findFirst();
-        if (!timer.isPresent()) return;
+        if (hasTimersEnabled(user)) {
+            List<TwasiTimer> timers = getRunningTimersForUser(user);
+            Optional<TwasiTimer> timer = timers.stream().filter(t -> t.getCommand().equalsIgnoreCase(command)).findFirst();
+            if (!timer.isPresent()) return;
 
-        timer.get().disable();
-        timers.remove(timer.get());
+            timer.get().disable();
+            timers.remove(timer.get());
+        }
     }
 
     public boolean timerExists(User user, String command) {
