@@ -30,7 +30,7 @@ public class TimerAddCommand extends TwasiSubCommand {
             long interval;
             try {
                 interval = Long.parseLong(args.get(1)) * 60;//Multiply by 60 to get Minutes
-                if (interval > Integer.MAX_VALUE) {
+                if (interval > 3600) {
                     event.reply(renderer.render("timer.error.interval.toohigh"));
                     return false;
                 }

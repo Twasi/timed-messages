@@ -1,7 +1,6 @@
 package at.saith.twasi.service;
 
 import at.saith.twasi.TimedMessagesPlugin;
-import at.saith.twasi.util.TimeFormatter;
 import net.twasi.core.database.models.TwitchAccount;
 import net.twasi.core.database.models.permissions.PermissionGroups;
 import net.twasi.core.interfaces.api.TwasiInterface;
@@ -21,20 +20,20 @@ public class TwasiTimer extends Timer {
     private int interval;
     private boolean enabled;
 
-    public TwasiTimer(TwasiInterface twasiInterface, String command, int interval, boolean enabled) {
+    public TwasiTimer(TwasiInterface twasiInterface, String command, int interval, boolean enabled, int initialDelayInSeconds) {
         super(true);
-        TwasiLogger.log.debug("Timer for the Command " + command + " in an interval of " + interval + "s started.");
         this.twasiInterface = twasiInterface;
         this.command = command;
         this.enabled = enabled;
         this.interval = interval;
         if (enabled) {
-            start();
+            start(initialDelayInSeconds);
         }
     }
 
-    public void start() {
-
+    public void start(int initialDelayInSeconds) {
+        int delay = (interval + initialDelayInSeconds);
+        TwasiLogger.log.info("Timer for the User " + twasiInterface.getStreamer().getUser().getTwitchAccount().getDisplayName() + " for the Command " + command + " in an interval of " + interval + "s and a delay of " + delay + "s started.");
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -46,7 +45,7 @@ public class TwasiTimer extends Timer {
             }
         };
 
-        scheduleAtFixedRate(task, 0, interval * 1000);
+        scheduleAtFixedRate(task, delay * 1000, interval * 1000);
     }
 
     public void disable() {
