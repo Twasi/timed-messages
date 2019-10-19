@@ -36,7 +36,7 @@ public class TimerService implements IService {
         User user = twasiInterface.getStreamer().getUser();
         TwasiLogger.log.debug("Starting timers for user " + user.getTwitchAccount().getDisplayName());
 
-        stopTimers(user);
+        stopTimers(user);//Make sure that no timer runs beforehand
 
         List<TwasiTimer> timers = new ArrayList<>();
         registeredTimers.put(user.getId(), timers);
@@ -53,7 +53,12 @@ public class TimerService implements IService {
         User user = twasiInterface.getStreamer().getUser();
         if (hasTimersEnabled(user)) {
             List<TwasiTimer> timers = registeredTimers.get(user.getId());
-            timers.add(new TwasiTimer(twasiInterface, command, interval, enabled, initialDelay));
+            TwasiTimer timer = new TwasiTimer(twasiInterface, command, interval, enabled);
+            if (timers.contains(timer)) {
+                timer = timers.get(timers.indexOf(timer));
+            }
+            timer.start(initialDelay);
+            timers.add(timer);
             TwasiLogger.log.debug("Started timer " + command + " for User " + user.getTwitchAccount().getDisplayName());
         } else {
             TwasiLogger.log.debug("Tried to start timer " + command + " but User " + user.getTwitchAccount().getDisplayName() + " hasn't timers enabled.");
