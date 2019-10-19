@@ -2,6 +2,7 @@ package at.saith.twasi;
 
 import at.saith.twasi.cmd.TimerCommand;
 import net.twasi.core.events.TwasiEventHandler;
+import net.twasi.core.logger.TwasiLogger;
 import net.twasi.core.plugin.api.TwasiUserPlugin;
 import net.twasi.core.plugin.api.events.TwasiDisableEvent;
 import net.twasi.core.plugin.api.events.TwasiEnableEvent;
@@ -43,6 +44,7 @@ public class TimedMessagesUserPlugin extends TwasiUserPlugin {
             @Override
             public void on(StreamTrackEvent streamTrackEvent) {
                 if (!TimedMessagesPlugin.SERVICE.hasTimersEnabled(streamTrackEvent.getUser())) {
+                    TwasiLogger.log.info("Starting Timers for " + streamTrackEvent.getUser().getTwitchAccount().getDisplayName() + " because the stream started.");
                     TimedMessagesPlugin.SERVICE.startTimers(TimedMessagesUserPlugin.this.getTwasiInterface());
                 }
             }
@@ -50,6 +52,7 @@ public class TimedMessagesUserPlugin extends TwasiUserPlugin {
         sts.registerStreamStopEvent(getTwasiInterface().getStreamer().getUser(), new TwasiEventHandler<StreamStopEvent>() {
             @Override
             public void on(StreamStopEvent streamStopEvent) {
+                TwasiLogger.log.info("Stopping Timers for " + streamStopEvent.getUser().getTwitchAccount().getDisplayName() + " because the stream stopped.");
                 TimedMessagesPlugin.SERVICE.stopTimers(TimedMessagesUserPlugin.this.getTwasiInterface().getStreamer().getUser());
             }
         });

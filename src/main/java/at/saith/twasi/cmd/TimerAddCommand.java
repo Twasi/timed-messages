@@ -15,7 +15,7 @@ import net.twasi.core.translations.renderer.TranslationRenderer;
 import java.util.List;
 
 public class TimerAddCommand extends TwasiSubCommand {
-
+    private static long MAX_INTERVAL = 3600;
     public TimerAddCommand(TwasiCustomCommandEvent event, ISubCommands parent) {
         super(event, parent);
     }
@@ -29,8 +29,11 @@ public class TimerAddCommand extends TwasiSubCommand {
             String command = args.get(0);
             long interval;
             try {
+
                 interval = Long.parseLong(args.get(1)) * 60;//Multiply by 60 to get Minutes
-                if (interval > 3600) {
+                if (interval > MAX_INTERVAL) {
+                    renderer.bind("interval",""+interval);
+                    renderer.bind("maxinterval",""+MAX_INTERVAL);
                     event.reply(renderer.render("timer.error.interval.toohigh"));
                     return false;
                 }

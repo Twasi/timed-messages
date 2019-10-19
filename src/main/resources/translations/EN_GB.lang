@@ -27,4 +27,4 @@ timer.error.command.notallowed=The command {command} doesn't support timers.
 
 timer.error.interval.notanumber=The given interval isn't a number. 4Head
 timer.error.interval.toolow=The given interval is too small.
-timer.error.interval.toohigh=The given interval is too high. Limit yourself to 35.791.394 minutes.
+timer.error.interval.toohigh=The given interval({interval}) is too high. Limit yourself to {maxinterval} minutes.

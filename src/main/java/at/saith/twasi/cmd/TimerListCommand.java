@@ -24,7 +24,7 @@ public class TimerListCommand extends TwasiSubCommand {
         if (!event.hasArgs()) {
             TimerService service = ServiceRegistry.get(TimerService.class);
             List<TimerEntity> timers = service.getTimersForUser(event.getTwasiInterface().getStreamer().getUser());
-            System.out.println(timers.size());
+
             StringBuilder timersBuilder = new StringBuilder();
             for (TimerEntity timer : timers) {
                 String enabled = timer.isEnabled() ? renderer.render("timer.enabled") : renderer.render("timer.disabled");
