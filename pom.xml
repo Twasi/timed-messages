@@ -24,8 +24,7 @@
         <dependency>
             <groupId>net.twasi</groupId>
             <artifactId>TwasiCore</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>net.twasidependency</groupId>

@@ -52,7 +52,7 @@ public class TwasiTimer extends Timer {
             int delay = (interval + initialDelayInSeconds);
 
             nextExecution = System.currentTimeMillis() + delay * 1000;
-            TwasiLogger.log.info(this + " starts in " + delay + "s.");
+            TwasiLogger.log.debug(this + " starts in " + delay + "s.");
             try {
 
                 scheduleAtFixedRate(task, delay * 1000, interval * 1000);
